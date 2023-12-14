@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "pw-helper"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+customtkinter = "5.2.1"
+packaging = "23.2"
+peewee = "3.17.0"
+ctklistbox = "0.10"
+selenium = "4.16.0"
+undetected-chromedriver = "3.5.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
