@@ -52,6 +52,7 @@ def login_straight(account, wait, root, text_box):
     resume_btn.click()
     text_box.insert("end", 'Авторизация на сайте успешно завершена\n')
     root.update_idletasks()
+    return True
 
 
 def login(account, driver, wait, root, text_box):
