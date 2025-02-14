@@ -13,6 +13,7 @@ peewee = "3.17.0"
 ctklistbox = "0.10"
 selenium = "4.16.0"
 undetected-chromedriver = "3.5.4"
+pyyaml = "6.0.2"
 
 
 [build-system]

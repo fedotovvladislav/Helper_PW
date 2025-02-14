@@ -1,0 +1,28 @@
+version: 1
+disable_existing_loggers: False
+common_handler_settings_1: &default_stream_setting
+  class: logging.StreamHandler
+  level: INFO
+  stream: ext://sys.stdout
+common_handler_settings_2: &default_file_setting
+  class: logging.handlers.TimedRotatingFileHandler
+  when: 'midnight'
+  interval: 1
+  backupCount: 5
+  level: INFO
+  encoding: 'utf-8'
+formatters:
+  base:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+handlers:
+  console:
+    <<: *default_stream_setting
+    formatter: base
+  log_file:
+    <<: *default_file_setting
+    formatter: base
+    filename: "logs/logs.log"
+loggers:
+  logger:
+    level: INFO
+    handlers: ["console", "log_file"]

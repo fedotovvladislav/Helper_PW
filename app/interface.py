@@ -10,6 +10,9 @@ from time import sleep
 from database.models import *
 from handlers.initial_item import initial
 from handlers.promocode import activate_promocode
+from logger_conf import get_logger
+
+logger = get_logger("logger")
 
 
 class CustomButton(CTkButton):
@@ -310,8 +313,9 @@ class Helper(HelperCRUD):
         step = 1 / count
         progress_step = 0
         self.widgets["progressbar"].set(0 - step)
+        dont_active_list = list()
         for element in characters:
-            activate_promocode(
+            is_active = activate_promocode(
                 root=self.root,
                 text_box=self.widgets["progress_text"],
                 character=element,
@@ -319,9 +323,21 @@ class Helper(HelperCRUD):
                 chest_list=chest_list,
                 locked_list=locked_list
             )
+            if not is_active:
+                dont_active_list.append(f"{element.nickname}: {element.email}")
             progress_step += step
             self.widgets["progressbar"].set(progress_step)
             self.root.update_idletasks()
+
+        if len(dont_active_list) > 0:
+            log_str = f"Не удалось передать предметы следующим аккаунтам: {'; '.join(dont_active_list)}"
+            self.widgets["progress_text"].insert("end", log_str)
+            logger.info(log_str)
+        else:
+            log_str = "Промокод успешно активирован на все аккаунты"
+            self.widgets["progress_text"].insert("end", log_str)
+            logger.info(log_str)
+
         self.widgets["progressbar"].stop()
 
 

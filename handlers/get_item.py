@@ -2,30 +2,40 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common.exceptions import NoSuchElementException
 from time import sleep
+from logger_conf import get_logger
+
+logger = get_logger("logger")
 
 
 def get_chest(driver, root, text_box, chest_list):
     text_box.insert("end", "Ищем нужные сундуки с функцией активации\n")
+    logger.info("Ищем нужные сундуки с функцией активации")
     root.update_idletasks()
     elements = driver.find_elements(by=By.CLASS_NAME, value='chest_input_block')
     for element in elements:
         for chest_item in chest_list:
             if chest_item.chest_name in element.text:
-                text_box.insert("end", f"Найден сундук {element.text}\n")
-                root.update_idletasks()
-                exist = element.find_element(by=By.CLASS_NAME, value="chest_activate_red")
-                exist.click()
-                chests = driver.find_elements(by=By.TAG_NAME, value='label')
-                for chest in chests:
-                    if chest_item.item_chest_name in chest.text:
-                        text_box.insert("end", f"Выбран предмет {chest.text}\n")
-                        root.update_idletasks()
-                        chest.click()
-                        break
+                return activate_chest(driver, root, text_box, element, chest_item, chest_list)
+    return False
 
-                activate = driver.find_element(by=By.CLASS_NAME, value="chest_submit_button")
-                activate.click()
-                break
+
+def activate_chest(driver, root, text_box, chest_elem, chest_item, chest_list):
+    text_box.insert("end", f"Найден сундук {chest_elem.text}\n")
+    logger.info("Ищем нужные сундуки с функцией активации")
+    root.update_idletasks()
+    exist = chest_elem.find_element(by=By.CLASS_NAME, value="chest_activate_red")
+    exist.click()
+    chests = driver.find_elements(by=By.TAG_NAME, value='label')
+    for chest in chests:
+        if chest_item.item_chest_name in chest.text:
+            text_box.insert("end", f"Выбран предмет {chest.text}\n")
+            logger.info(f"Выбран предмет {chest.text}")
+            root.update_idletasks()
+            chest.click()
+            break
+    activate = driver.find_element(by=By.CLASS_NAME, value="chest_submit_button")
+    activate.click()
+    return get_chest(driver, root, text_box, chest_list)
 
 
 def activated_items(driver, text_box, root, locked_list):
@@ -46,6 +56,7 @@ def activated_items(driver, text_box, root, locked_list):
 
     items = driver.find_elements(by=By.CLASS_NAME, value='item_input_block')
     text_box.insert("end", "Убираем итемы из блок листа\n")
+    logger.info(f"Убираем итемы из блок листа")
     root.update_idletasks()
     for item in items:
         for block_item in locked_list:
@@ -58,12 +69,14 @@ def activated_items(driver, text_box, root, locked_list):
 
 def select_character(driver, character, text_box, root):
     text_box.insert("end", "Выбираем сервер\n")
+    logger.info(f"Выбираем сервер")
     root.update_idletasks()
     drop = Select(driver.find_element(by=By.CLASS_NAME, value='js-shard'))
     try:
         drop.select_by_visible_text(text=character.server.name)
     except NoSuchElementException:
         text_box.insert("end", f"Для данного аккаунта сервер {character.server.name} недоступен\n")
+        logger.error(f"Для данного аккаунта сервер {character.server.name} недоступен")
         root.update_idletasks()
 
     drop = Select(driver.find_element(by=By.CLASS_NAME, value='js-char'))
@@ -75,8 +88,10 @@ def select_character(driver, character, text_box, root):
             driver.find_element(by=By.CLASS_NAME, value='go_items').click()
             text_box.insert("end", f"Подарки переведены персонажу {character.nickname} на сервер "
                                    f"{character.server.name}\n\n\n")
+            logger.info(f"Подарки переведены персонажу {character.nickname} на сервер {character.server.name}")
             root.update_idletasks()
             break
     else:
         text_box.insert("end", f"Персонаж {character.nickname} не обнаружен\n\n\n")
+        logger.error(f"Персонаж {character.nickname} не обнаружен")
         root.update_idletasks()

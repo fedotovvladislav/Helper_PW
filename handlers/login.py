@@ -3,11 +3,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException as TES
+from logger_conf import get_logger
+
+logger = get_logger("logger")
 
 
 def login_mail(driver, login_page, account, wait, root, text_box):
     try:
         text_box.insert("end", f'Начало авторизации Mail. Персонаж {account.nickname}\n')
+        logger.info(f"Начало авторизации Mail. Персонаж {account.nickname}")
         root.update_idletasks()
         driver.switch_to.window(driver.window_handles[-1])
         search_btn = wait.until(EC.presence_of_element_located(
@@ -26,6 +30,7 @@ def login_mail(driver, login_page, account, wait, root, text_box):
             (By.CLASS_NAME, 'ph-btn_main')))
         resume_btn.click()
         text_box.insert("end", 'Авторизация Mail успешно завершена\n')
+        logger.info(f"Авторизация Mail успешно завершена")
         root.update_idletasks()
         return True
     except TES:
@@ -37,20 +42,30 @@ def login_mail(driver, login_page, account, wait, root, text_box):
 
 def login_straight(account, wait, root, text_box):
     text_box.insert("end", f'Начало авторизации на сайте. Персонаж {account.nickname}\n')
+    logger.info(f"Начало авторизации на сайте. Персонаж {account.nickname}")
     root.update_idletasks()
     input_email = wait.until(EC.presence_of_element_located(
         (By.NAME, 'login')))
-    input_pwd = wait.until(EC.presence_of_element_located(
-        (By.NAME, 'password')))
+
     input_email.send_keys(account.email)
-    input_pwd.send_keys(account.password)
+
     login_btn = wait.until(EC.presence_of_element_located(
         (By.CLASS_NAME, 'gtm_login_btn')))
     login_btn.click()
+
+    input_pwd = wait.until(EC.presence_of_element_located(
+        (By.NAME, 'password')))
+    input_pwd.send_keys(account.password)
     resume_btn = wait.until(EC.presence_of_element_located(
-        (By.CLASS_NAME, 'ph-btn_main')))
+        (By.CLASS_NAME, 'vkuiButton')))
     resume_btn.click()
+
+    resume_btn = wait.until(EC.presence_of_element_located(
+        (By.CLASS_NAME, 'ph-btn_lg')))
+    resume_btn.click()
+
     text_box.insert("end", 'Авторизация на сайте успешно завершена\n')
+    logger.info(f"Авторизация на сайте успешно завершена")
     root.update_idletasks()
     return True
 

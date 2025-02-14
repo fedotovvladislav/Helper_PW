@@ -12,8 +12,8 @@ def get_driver():
     options.add_argument('--no-sandbox')
     options.add_argument('--start-maximized')
     options.add_experimental_option("prefs", prefs)
-    options.add_argument('--headless')
-    driver = uc.Chrome(use_subprocess=True, options=options)
+    # options.add_argument('--headless')
+    driver = uc.Chrome(use_subprocess=True, options=options, version_main=129)
     wait = WebDriverWait(driver, 10)
 
     return driver, wait
